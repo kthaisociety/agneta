@@ -1,0 +1,14 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  build:
+    uses: kthaisociety/workflows/.github/workflows/build.yml@v0.2.0
+    permissions:
+      contents: read
+      packages: write
