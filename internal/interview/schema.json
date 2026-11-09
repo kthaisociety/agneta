@@ -26,6 +26,7 @@
       "minItems": 1,
       "items": {
         "type": "object",
+        "required": ["question", "answer"],
         "properties": {
           "question": {
             "description": "The question as asked.",
