@@ -8,7 +8,8 @@
   "properties": {
     "name": {
       "description": "The interviewee's name.",
-      "type": "string"
+      "type": "string",
+      "pattern": "\\S"
     },
     "date": {
       "description": "The day the document was written, as YYYY-MM-DD.",
