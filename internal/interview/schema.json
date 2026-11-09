@@ -18,7 +18,7 @@
     },
     "role": {
       "description": "The interviewee's role.",
-      "type": "string"
+      "enum": ["Board advisor", "Board member", "Tech lead"]
     },
     "segments": {
       "description": "Every question asked, each paired with its answer.",
