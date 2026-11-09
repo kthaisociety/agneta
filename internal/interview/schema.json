@@ -13,7 +13,8 @@
     },
     "date": {
       "description": "The day the document was written, as YYYY-MM-DD.",
-      "type": "string"
+      "type": "string",
+      "format": "date"
     },
     "role": {
       "description": "The interviewee's role.",
