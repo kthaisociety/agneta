@@ -20,6 +20,7 @@
     "segments": {
       "description": "Every question asked, each paired with its answer.",
       "type": "array",
+      "minItems": 1,
       "items": {
         "type": "object",
         "properties": {
