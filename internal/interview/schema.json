@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:agneta:interview",
+  "title": "Interview document",
+  "description": "What an interview agent writes after interviewing one person: who they are, the day the document was written, and every question asked paired with its answer.",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "The interviewee's name.",
+      "type": "string"
+    },
+    "date": {
+      "description": "The day the document was written, as YYYY-MM-DD.",
+      "type": "string"
+    },
+    "role": {
+      "description": "The interviewee's role.",
+      "type": "string"
+    },
+    "segments": {
+      "description": "Every question asked, each paired with its answer.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "description": "The question as asked.",
+            "type": "string"
+          },
+          "answer": {
+            "description": "The interviewee's answer.",
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
