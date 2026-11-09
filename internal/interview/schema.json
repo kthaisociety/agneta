@@ -4,6 +4,7 @@
   "title": "Interview document",
   "description": "What an interview agent writes after interviewing one person: who they are, the day the document was written, and every question asked paired with its answer.",
   "type": "object",
+  "additionalProperties": false,
   "required": ["name", "date", "role", "segments"],
   "properties": {
     "name": {
@@ -26,6 +27,7 @@
       "minItems": 1,
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "required": ["question", "answer"],
         "properties": {
           "question": {
