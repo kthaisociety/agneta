@@ -21,7 +21,7 @@ var schema = compileSchema()
 // compileSchema compiles the embedded interview schema with format assertion
 // on. It panics if the schema itself is invalid.
 func compileSchema() *jsonschema.Schema {
-	parsed, err := jsonschema.UnmarshalJSON(bytes.NewReader(schemaJSON))
+	parsed, err := parseJSON(schemaJSON)
 	if err != nil {
 		panic(err)
 	}
@@ -38,9 +38,15 @@ func compileSchema() *jsonschema.Schema {
 // error, or a *jsonschema.ValidationError listing every problem with the path
 // to each bad field.
 func Validate(doc []byte) error {
-	parsed, err := jsonschema.UnmarshalJSON(bytes.NewReader(doc))
+	parsed, err := parseJSON(doc)
 	if err != nil {
 		return err
 	}
 	return schema.Validate(parsed)
+}
+
+// parseJSON decodes raw JSON into the value form the jsonschema package
+// validates. It returns the parse error if raw is not valid JSON.
+func parseJSON(raw []byte) (any, error) {
+	return jsonschema.UnmarshalJSON(bytes.NewReader(raw))
 }
