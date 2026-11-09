@@ -9,29 +9,34 @@ import (
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
+// schemaURL names the interview schema inside the compiler. It shows up in
+// validation error messages.
+const schemaURL = "urn:agneta:interview"
+
 //go:embed schema.json
 var schemaJSON []byte
 
-var schema = mustCompile(schemaJSON)
+var schema = compileSchema()
 
-// mustCompile compiles a JSON Schema with format assertion on, and panics if
-// the schema itself is invalid.
-func mustCompile(source []byte) *jsonschema.Schema {
-	parsed, err := jsonschema.UnmarshalJSON(bytes.NewReader(source))
+// compileSchema compiles the embedded interview schema with format assertion
+// on. It panics if the schema itself is invalid.
+func compileSchema() *jsonschema.Schema {
+	parsed, err := jsonschema.UnmarshalJSON(bytes.NewReader(schemaJSON))
 	if err != nil {
 		panic(err)
 	}
 	compiler := jsonschema.NewCompiler()
 	compiler.AssertFormat()
-	const location = "urn:agneta:interview"
-	if err := compiler.AddResource(location, parsed); err != nil {
+	if err := compiler.AddResource(schemaURL, parsed); err != nil {
 		panic(err)
 	}
-	return compiler.MustCompile(location)
+	return compiler.MustCompile(schemaURL)
 }
 
 // Validate reports whether doc, a JSON document, is a valid interview document.
-// It returns nil for a valid document and an error describing every problem otherwise.
+// It returns nil for a valid document. Otherwise it returns the JSON parse
+// error, or a *jsonschema.ValidationError listing every problem with the path
+// to each bad field.
 func Validate(doc []byte) error {
 	parsed, err := jsonschema.UnmarshalJSON(bytes.NewReader(doc))
 	if err != nil {
