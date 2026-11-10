@@ -17,7 +17,7 @@ import (
 // TestHealthAnswersOK checks that GET /health answers success with the body ok.
 func TestHealthAnswersOK(t *testing.T) {
 	recorder := httptest.NewRecorder()
-	Handler().ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, "/health", nil))
+	routes().ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, "/health", nil))
 	if recorder.Code != http.StatusOK {
 		t.Errorf("status = %d, want %d", recorder.Code, http.StatusOK)
 	}
@@ -32,7 +32,7 @@ func TestHealthRejectsOtherMethods(t *testing.T) {
 	for _, method := range []string{http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete} {
 		t.Run(method, func(t *testing.T) {
 			recorder := httptest.NewRecorder()
-			Handler().ServeHTTP(recorder, httptest.NewRequest(method, "/health", nil))
+			routes().ServeHTTP(recorder, httptest.NewRequest(method, "/health", nil))
 			if recorder.Code != http.StatusMethodNotAllowed {
 				t.Errorf("status = %d, want %d", recorder.Code, http.StatusMethodNotAllowed)
 			}
@@ -45,7 +45,7 @@ func TestUnknownPathNotFound(t *testing.T) {
 	for _, path := range []string{"/", "/healthz", "/health/x"} {
 		t.Run(path, func(t *testing.T) {
 			recorder := httptest.NewRecorder()
-			Handler().ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, path, nil))
+			routes().ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, path, nil))
 			if recorder.Code != http.StatusNotFound {
 				t.Errorf("status = %d, want %d", recorder.Code, http.StatusNotFound)
 			}

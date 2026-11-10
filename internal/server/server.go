@@ -16,10 +16,10 @@ import (
 // service is told to stop.
 const shutdownLimit = 10 * time.Second
 
-// Handler returns the routes the service answers: GET /health answers ok.
+// routes returns the routes the service answers: GET /health answers ok.
 // Any other method on /health is method not allowed, and any other path is
 // not found.
-func Handler() http.Handler {
+func routes() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", answerHealth)
 	return mux
@@ -30,7 +30,7 @@ func answerHealth(w http.ResponseWriter, _ *http.Request) {
 	io.WriteString(w, "ok")
 }
 
-// Run listens on cfg.Port and serves Handler until ctx is cancelled. It logs
+// Run listens on cfg.Port and serves routes until ctx is cancelled. It logs
 // one line naming the port once listening and one line once stopped. It
 // returns an error if the port cannot be opened or the server fails; a
 // shutdown through ctx returns nil.
@@ -39,7 +39,7 @@ func Run(ctx context.Context, cfg Config, logger *slog.Logger) error {
 	if err != nil {
 		return err
 	}
-	return serve(ctx, listener, Handler(), logger)
+	return serve(ctx, listener, routes(), logger)
 }
 
 // serve answers requests on listener with handler until ctx is cancelled.

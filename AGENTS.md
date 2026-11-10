@@ -7,7 +7,8 @@ validates it and stores its records in Postgres. Nothing reads them back yet.
 ## Commands
 
 - Test: `go test ./...`
-- Image: `docker build -t agneta .` (placeholder image)
+- Run: `go run ./cmd/agneta` (port from `PORT`, default 8000)
+- Image: `docker build -t agneta .`
 
 ## MVP
 
