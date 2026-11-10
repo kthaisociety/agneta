@@ -1,9 +1,12 @@
-# Placeholder until the stack is chosen.
+FROM golang:1.27 AS build
+WORKDIR /src
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /agneta ./cmd/agneta
 
-FROM busybox:1.37
-RUN mkdir -p /www \
-    && echo "agneta placeholder" > /www/index.html \
-    && adduser -D -u 10001 app
-USER app
+FROM scratch
+COPY --from=build /agneta /agneta
+USER 10001
 EXPOSE 8000
-CMD ["httpd", "-f", "-v", "-p", "8000", "-h", "/www"]
+ENTRYPOINT ["/agneta"]
