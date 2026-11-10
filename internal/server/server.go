@@ -3,14 +3,24 @@ package server
 
 import (
 	"context"
+	"io"
 	"log/slog"
 	"net"
 	"net/http"
 )
 
-// Handler returns the routes the service answers.
+// Handler returns the routes the service answers: GET /health answers ok.
+// Any other method on /health is method not allowed, and any other path is
+// not found.
 func Handler() http.Handler {
-	return http.NewServeMux()
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /health", answerHealth)
+	return mux
+}
+
+// answerHealth tells the caller the process is up.
+func answerHealth(w http.ResponseWriter, _ *http.Request) {
+	io.WriteString(w, "ok")
 }
 
 // Run listens on cfg.Port and serves Handler until ctx is cancelled.
