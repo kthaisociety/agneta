@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Interview document",
+  "description": "What an interview agent writes after interviewing one person: who they are, the day the document was written, and every question asked paired with its answer.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "date", "role", "segments"],
+  "properties": {
+    "name": {
+      "description": "The interviewee's name.",
+      "type": "string",
+      "pattern": "\\S"
+    },
+    "date": {
+      "description": "The day the document was written, as YYYY-MM-DD.",
+      "type": "string",
+      "format": "date"
+    },
+    "role": {
+      "description": "The interviewee's role.",
+      "enum": ["Board advisor", "Board member", "Tech lead"]
+    },
+    "segments": {
+      "description": "Every question asked, each paired with its answer.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["question", "answer"],
+        "properties": {
+          "question": {
+            "description": "The question as asked.",
+            "type": "string",
+            "pattern": "\\S"
+          },
+          "answer": {
+            "description": "The interviewee's answer.",
+            "type": "string",
+            "pattern": "\\S"
+          }
+        }
+      }
+    }
+  }
+}

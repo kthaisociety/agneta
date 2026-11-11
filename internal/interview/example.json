@@ -1,0 +1,19 @@
+{
+  "name": "John Doe",
+  "date": "2026-11-09",
+  "role": "Board member",
+  "segments": [
+    {
+      "question": "Who has to approve a new sponsorship deal?",
+      "answer": "The head of partnerships negotiates it, but anything above 50 000 SEK needs a board vote before we sign."
+    },
+    {
+      "question": "Where do the logins for the shared accounts live?",
+      "answer": "In the board's password vault. The chair and the treasurer are the only admins, so ask one of them for access."
+    },
+    {
+      "question": "What do you wish you had known when you joined the board?",
+      "answer": "That the autumn budget is locked in September. Anything you want funded for spring has to be raised before then."
+    }
+  ]
+}
