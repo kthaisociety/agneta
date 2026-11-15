@@ -21,7 +21,7 @@ Words as this project uses them.
 - **Report**: one JSON file per interview, a flat list of records.
 - **Record**: one atomic question–answer pair with its date. How records relate to Accounts and Cases is
   not decided yet.
-- **Author**: who uploaded a report, taken from their sign-in. Stored for traceability, never shown to
+- **Author**: who submitted a report, taken from their sign-in. Stored for traceability, never shown to
   agents or the Board. This conflicts with the Counsel naming who said each Account; still open.
-- **Upload service**: this repo's backend. Validates reports and writes records to Postgres; later also
-  serves the MCP tools.
+- **MCP server**: this repo's backend. Its `submit_report` tool validates a report; later it also stores its
+  records in Postgres and serves the Counsel's tools.

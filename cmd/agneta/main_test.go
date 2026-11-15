@@ -10,8 +10,7 @@ import (
 	"time"
 )
 
-// startupFails runs the service with the given PORT and returns its exit code
-// and what it wrote to stderr. It fails the test if the service keeps running.
+// startupFails runs the service with PORT and returns its exit code and stderr, failing if it keeps running.
 func startupFails(t *testing.T, port string) (int, string) {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -30,8 +29,7 @@ func startupFails(t *testing.T, port string) (int, string) {
 	return code, stderr.String()
 }
 
-// assertOneLineFailure fails the test unless the exit code is a failure and
-// stderr is exactly one line containing want.
+// assertOneLineFailure fails unless the exit code is a failure and stderr is one line containing want.
 func assertOneLineFailure(t *testing.T, code int, stderr, want string) {
 	t.Helper()
 	if code == 0 {
@@ -46,8 +44,7 @@ func assertOneLineFailure(t *testing.T, code int, stderr, want string) {
 	}
 }
 
-// TestInvalidPortStopsStartup checks that a PORT that is not a number or is
-// out of range stops startup with one line naming PORT and a failure code.
+// TestInvalidPortStopsStartup checks that a bad PORT stops startup with one line naming it.
 func TestInvalidPortStopsStartup(t *testing.T) {
 	for _, port := range []string{"abc", "70000"} {
 		t.Run(port, func(t *testing.T) {
@@ -57,8 +54,7 @@ func TestInvalidPortStopsStartup(t *testing.T) {
 	}
 }
 
-// TestPortInUseStopsStartup checks that a port something else holds stops
-// startup with one line saying so and a failure code.
+// TestPortInUseStopsStartup checks that a taken port stops startup with one line saying so.
 func TestPortInUseStopsStartup(t *testing.T) {
 	holder, err := net.Listen("tcp", ":0")
 	if err != nil {

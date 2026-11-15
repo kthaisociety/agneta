@@ -12,12 +12,14 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/kthaisociety/agneta/internal/config"
 )
 
 // TestHealthAnswersOK checks that GET /health answers success with the body ok.
 func TestHealthAnswersOK(t *testing.T) {
 	recorder := httptest.NewRecorder()
-	routes().ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, "/health", nil))
+	Routes(nil).ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, "/health", nil))
 	if recorder.Code != http.StatusOK {
 		t.Errorf("status = %d, want %d", recorder.Code, http.StatusOK)
 	}
@@ -26,13 +28,12 @@ func TestHealthAnswersOK(t *testing.T) {
 	}
 }
 
-// TestHealthRejectsOtherMethods checks that /health answers any method but GET
-// with method not allowed.
+// TestHealthRejectsOtherMethods checks that /health answers any method but GET with 405.
 func TestHealthRejectsOtherMethods(t *testing.T) {
 	for _, method := range []string{http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete} {
 		t.Run(method, func(t *testing.T) {
 			recorder := httptest.NewRecorder()
-			routes().ServeHTTP(recorder, httptest.NewRequest(method, "/health", nil))
+			Routes(nil).ServeHTTP(recorder, httptest.NewRequest(method, "/health", nil))
 			if recorder.Code != http.StatusMethodNotAllowed {
 				t.Errorf("status = %d, want %d", recorder.Code, http.StatusMethodNotAllowed)
 			}
@@ -45,7 +46,7 @@ func TestUnknownPathNotFound(t *testing.T) {
 	for _, path := range []string{"/", "/healthz", "/health/x"} {
 		t.Run(path, func(t *testing.T) {
 			recorder := httptest.NewRecorder()
-			routes().ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, path, nil))
+			Routes(nil).ServeHTTP(recorder, httptest.NewRequest(http.MethodGet, path, nil))
 			if recorder.Code != http.StatusNotFound {
 				t.Errorf("status = %d, want %d", recorder.Code, http.StatusNotFound)
 			}
@@ -88,15 +89,15 @@ func getHealth(t *testing.T, port int) string {
 	}
 }
 
-// TestRunListensLogsAndStops checks that Run opens the configured port, logs
-// one line naming it, answers /health, and on cancel logs one line and
-// returns without error.
+// TestRunListensLogsAndStops checks that Run logs the port, answers /health and stops cleanly on cancel.
 func TestRunListensLogsAndStops(t *testing.T) {
 	port := freePort(t)
 	var log bytes.Buffer
 	ctx, cancel := context.WithCancel(context.Background())
 	done := make(chan error, 1)
-	go func() { done <- Run(ctx, Config{Port: port}, slog.New(slog.NewTextHandler(&log, nil))) }()
+	go func() {
+		done <- Run(ctx, config.Config{Port: port}, Routes(nil), slog.New(slog.NewTextHandler(&log, nil)))
+	}()
 
 	if body := getHealth(t, port); body != "ok" {
 		t.Errorf("GET /health body = %q, want %q", body, "ok")
@@ -123,8 +124,7 @@ func TestRunListensLogsAndStops(t *testing.T) {
 	}
 }
 
-// TestServeFinishesInFlightRequests checks that a request in progress when
-// shutdown starts still gets its full answer, and new connections are refused.
+// TestServeFinishesInFlightRequests checks that shutdown finishes in-flight requests and refuses new ones.
 func TestServeFinishesInFlightRequests(t *testing.T) {
 	started := make(chan struct{})
 	release := make(chan struct{})

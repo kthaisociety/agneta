@@ -1,23 +1,25 @@
 # AGENTS.md
 
 agneta: captures what KTHAIS Advisors know but never wrote down, so the Board keeps that guidance after they
-leave. The MVP only collects knowledge: an interview skill writes a JSON report, the upload service
-validates it and stores its records in Postgres. Nothing reads them back yet.
+leave. The MVP only collects knowledge: an interview skill submits a JSON report through this repo's MCP
+server, which validates it and stores its records in Postgres. Nothing reads them back yet.
 
 ## Commands
 
-- Test: `go test ./...`
-- Run: `go run ./cmd/agneta` (port from `PORT`, default 8000)
+- Test: `make test` (vet and race-detected tests, as the PR check runs them)
+- Run: `cp .env.example .env`, then `make run`. Every setting comes from the environment (PCR 0005).
 - Image: `docker build -t agneta .`
 
 ## MVP
 
-- **Interview skill**: an agent skill, outside this repo, that runs an interview and writes one report.
+- **Interview skill**: an agent skill that runs an interview, gets the Advisor's approval and submits one
+  report with the `submit_report` MCP tool.
 - **Report**: one JSON file per interview: the interviewee's name, role and the date once at the top, then a
   list of question–answer segments. The schema lives in the `interview` package (issue #1).
-- **Upload service**: a signed-in user uploads a report; the service validates it against the
-  schema and writes its records to Postgres, with the author taken from the sign-in.
-- Not in the MVP: the MCP server, the Mattermost bot, retrieval, transcription and private Sources.
+- **MCP server**: this repo. `/mcp` serves `submit_report`, which validates the report against the schema
+  (ADR 0001). Sign-in and Postgres storage are not built yet: a valid report is acknowledged with
+  `stored: false`, and there is no author.
+- Not in the MVP: the Mattermost bot, retrieval, transcription and private Sources.
 
 ## Rules
 

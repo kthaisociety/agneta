@@ -4,24 +4,29 @@ package server
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"log/slog"
 	"net"
 	"net/http"
+	"strconv"
 	"time"
+
+	"github.com/kthaisociety/agneta/internal/config"
 )
 
-// shutdownLimit is how long requests in progress get to finish once the
-// service is told to stop.
+// shutdownLimit is how long in-flight requests get to finish once the service is told to stop.
 const shutdownLimit = 10 * time.Second
 
-// routes returns the routes the service answers: GET /health answers ok.
-// Any other method on /health is method not allowed, and any other path is
-// not found.
-func routes() http.Handler {
+// readHeaderLimit is how long a client gets to send its request headers.
+const readHeaderLimit = 10 * time.Second
+
+// Routes serves GET /health, and mcp on /mcp unless it is nil; any other path is not found.
+func Routes(mcp http.Handler) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /health", answerHealth)
+	if mcp != nil {
+		mux.Handle("/mcp", mcp)
+	}
 	return mux
 }
 
@@ -30,23 +35,18 @@ func answerHealth(w http.ResponseWriter, _ *http.Request) {
 	io.WriteString(w, "ok")
 }
 
-// Run listens on cfg.Port and serves routes until ctx is cancelled. It logs
-// one line naming the port once listening and one line once stopped. It
-// returns an error if the port cannot be opened or the server fails; a
-// shutdown through ctx returns nil.
-func Run(ctx context.Context, cfg Config, logger *slog.Logger) error {
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Port))
+// Run serves handler on cfg.Host:cfg.Port until ctx is cancelled, logging one line on start and one on stop.
+func Run(ctx context.Context, cfg config.Config, handler http.Handler, logger *slog.Logger) error {
+	listener, err := net.Listen("tcp", net.JoinHostPort(cfg.Host, strconv.Itoa(cfg.Port)))
 	if err != nil {
 		return err
 	}
-	return serve(ctx, listener, routes(), logger)
+	return serve(ctx, listener, handler, logger)
 }
 
-// serve answers requests on listener with handler until ctx is cancelled.
-// It then stops accepting connections, lets requests in progress finish
-// within shutdownLimit, and returns. It closes listener.
+// serve answers on listener until ctx is cancelled, then lets in-flight requests finish within shutdownLimit.
 func serve(ctx context.Context, listener net.Listener, handler http.Handler, logger *slog.Logger) error {
-	server := &http.Server{Handler: handler}
+	server := &http.Server{Handler: handler, ReadHeaderTimeout: readHeaderLimit}
 	failed := make(chan error, 1)
 	go func() { failed <- server.Serve(listener) }()
 	logger.Info("listening", "port", listener.Addr().(*net.TCPAddr).Port)

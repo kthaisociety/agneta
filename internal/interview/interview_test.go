@@ -10,8 +10,7 @@ import (
 	"github.com/santhosh-tekuri/jsonschema/v6"
 )
 
-// validDoc returns a fresh interview document that the schema should accept,
-// for a test to break in one place.
+// validDoc returns a fresh valid document for a test to break in one place.
 func validDoc() map[string]any {
 	return map[string]any{
 		"name": "Ada Lovelace",
@@ -41,8 +40,7 @@ func validate(t *testing.T, doc map[string]any) error {
 	return Validate(encoded)
 }
 
-// failure is one problem the schema found: where in the document, and which
-// schema keyword it broke.
+// failure is one schema problem: where in the document and which keyword broke.
 type failure struct {
 	location string
 	keyword  string
@@ -69,8 +67,7 @@ func failures(err *jsonschema.ValidationError) []failure {
 	return all
 }
 
-// assertRejected fails the test unless doc is rejected by the schema with a
-// problem at location that breaks keyword.
+// assertRejected fails unless doc is rejected with a keyword failure at location.
 func assertRejected(t *testing.T, doc map[string]any, location, keyword string) {
 	t.Helper()
 	err := validate(t, doc)
@@ -88,8 +85,7 @@ func assertRejected(t *testing.T, doc map[string]any, location, keyword string) 
 	t.Fatalf("want a %q failure at %q, got %+v", keyword, location, got)
 }
 
-// TestValidate_AcceptsDocument checks that the schema accepts a document with
-// name, date and role at the top and every question paired with its answer.
+// TestValidate_AcceptsDocument checks that a complete document is accepted.
 func TestValidate_AcceptsDocument(t *testing.T) {
 	doc := validDoc()
 	doc["role"] = "Tech lead"
@@ -102,8 +98,7 @@ func TestValidate_AcceptsDocument(t *testing.T) {
 	}
 }
 
-// TestValidate_AcceptsExample checks that the three-Q&A example document
-// passes the schema.
+// TestValidate_AcceptsExample checks that the three-Q&A example passes.
 func TestValidate_AcceptsExample(t *testing.T) {
 	example, err := os.ReadFile("example.json")
 	if err != nil {
@@ -123,16 +118,14 @@ func TestValidate_AcceptsExample(t *testing.T) {
 	}
 }
 
-// TestValidate_RejectsEmptySegmentList checks that a document with no Q&A
-// segments is rejected.
+// TestValidate_RejectsEmptySegmentList checks that zero segments is rejected.
 func TestValidate_RejectsEmptySegmentList(t *testing.T) {
 	doc := validDoc()
 	doc["segments"] = []any{}
 	assertRejected(t, doc, "/segments", "minItems")
 }
 
-// TestValidate_RejectsMissingTopLevelField checks that a document missing its
-// name, date or role is rejected.
+// TestValidate_RejectsMissingTopLevelField checks that a missing name, date or role is rejected.
 func TestValidate_RejectsMissingTopLevelField(t *testing.T) {
 	for _, field := range []string{"name", "date", "role"} {
 		t.Run(field, func(t *testing.T) {
@@ -143,8 +136,7 @@ func TestValidate_RejectsMissingTopLevelField(t *testing.T) {
 	}
 }
 
-// TestValidate_RejectsBlankName checks that an empty or whitespace-only name
-// is rejected.
+// TestValidate_RejectsBlankName checks that an empty or whitespace-only name is rejected.
 func TestValidate_RejectsBlankName(t *testing.T) {
 	for _, name := range []string{"", " ", " \t\n "} {
 		t.Run(name, func(t *testing.T) {
@@ -155,8 +147,7 @@ func TestValidate_RejectsBlankName(t *testing.T) {
 	}
 }
 
-// TestValidate_RejectsImpossibleDate checks that a date that is not a real
-// calendar date is rejected.
+// TestValidate_RejectsImpossibleDate checks that a non-calendar date is rejected.
 func TestValidate_RejectsImpossibleDate(t *testing.T) {
 	for _, date := range []string{"2026-02-30", "2026-13-01", "9 November 2026", "yesterday"} {
 		t.Run(date, func(t *testing.T) {
@@ -167,8 +158,7 @@ func TestValidate_RejectsImpossibleDate(t *testing.T) {
 	}
 }
 
-// TestValidate_RejectsUnknownRole checks that a role outside Board advisor,
-// Board member and Tech lead is rejected.
+// TestValidate_RejectsUnknownRole checks that a role outside the three allowed is rejected.
 func TestValidate_RejectsUnknownRole(t *testing.T) {
 	for _, role := range []string{"CEO", "board advisor", ""} {
 		t.Run(role, func(t *testing.T) {
@@ -179,8 +169,7 @@ func TestValidate_RejectsUnknownRole(t *testing.T) {
 	}
 }
 
-// TestValidate_RejectsSegmentMissingField checks that a segment missing its
-// question or answer is rejected.
+// TestValidate_RejectsSegmentMissingField checks that a segment missing a field is rejected.
 func TestValidate_RejectsSegmentMissingField(t *testing.T) {
 	for _, field := range []string{"question", "answer"} {
 		t.Run(field, func(t *testing.T) {
@@ -191,8 +180,7 @@ func TestValidate_RejectsSegmentMissingField(t *testing.T) {
 	}
 }
 
-// TestValidate_RejectsBlankSegmentField checks that an empty or
-// whitespace-only question or answer is rejected.
+// TestValidate_RejectsBlankSegmentField checks that a blank question or answer is rejected.
 func TestValidate_RejectsBlankSegmentField(t *testing.T) {
 	for _, field := range []string{"question", "answer"} {
 		for _, value := range []string{"", " ", " \t\n "} {
@@ -205,8 +193,7 @@ func TestValidate_RejectsBlankSegmentField(t *testing.T) {
 	}
 }
 
-// TestValidate_RejectsUnknownField checks that an unknown extra field, at the
-// top level or in a segment, is rejected.
+// TestValidate_RejectsUnknownField checks that extra fields are rejected anywhere.
 func TestValidate_RejectsUnknownField(t *testing.T) {
 	t.Run("top level", func(t *testing.T) {
 		doc := validDoc()
