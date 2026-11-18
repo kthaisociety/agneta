@@ -65,7 +65,7 @@ Work only from this conversation.
 
 1. For each question ID, first collect what the Advisor said about it, as close to their words as you can.
 2. Write each answer only from that. Leave out anything they didn't say. If they didn't answer, say so. Never fill gaps.
-3. Show the report and ask the Advisor to check it. Make their corrections. When they approve, tell them to upload it to Agneta.
+3. Show the report and ask the Advisor to check it. Make their corrections. When they approve, call the `submit_report` tool with the report. If it returns an error, fix every problem it lists and call it again. When it returns `"accepted": true`, tell the Advisor it was received. Don't say it was stored: the tool returns `stored: false` until storage exists.
 
 ### What every report contains
 
