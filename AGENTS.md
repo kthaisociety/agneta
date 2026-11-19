@@ -9,6 +9,9 @@ server, which validates it and stores its records in Postgres. Nothing reads the
 - Test: `make test` (vet and race-detected tests, as the PR check runs them)
 - Run: `cp .env.example .env`, then `make run`. Every setting comes from the environment (PCR 0005).
 - Image: `docker build -t agneta .`
+- Database: `docker compose up -d` starts local Postgres; `go tool goose up` applies the migrations in
+  `internal/db/migrations/` (PCR 0006). `docker compose down` stops it and keeps
+  the data; `docker compose down -v` also deletes the data, for a fresh start.
 
 ## MVP
 

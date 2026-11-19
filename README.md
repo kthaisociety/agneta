@@ -14,7 +14,16 @@ cp .env.example .env
 make run
 ```
 
-It serves `GET /health`, which answers `ok`, and the MCP endpoint at `/mcp`. There is no sign-in and no storage yet: a valid report is answered with `{"accepted": true, "stored": false, "record_count": N}`, and an invalid one with a tool error listing every bad field. Use synthetic interviews only.
+Start a local Postgres and create its tables (the settings come from `.env`):
+
+```
+docker compose up -d
+go tool goose up
+```
+
+The server doesn't use the database yet; the tables are described in docs/adr/0002.
+
+The MCP server serves `GET /health`, which answers `ok`, and the MCP endpoint at `/mcp`. There is no sign-in and no storage connected yet: a valid report is answered with `{"accepted": true, "stored": false, "record_count": N}`, and an invalid one with a tool error listing every bad field. Use synthetic interviews only.
 
 ### Connect Claude
 
