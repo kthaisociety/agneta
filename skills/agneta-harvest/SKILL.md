@@ -14,7 +14,8 @@ The interview usually happens in voice mode. Write every turn as something you w
 ## Before you start (in text)
 
 1. Find the Board's questions: a block the user pasted that starts with `AGNETA QUESTIONS`, or else `questions.md` in this skill. Each question has an ID like Q1. If you find neither, ask the user to paste them and wait.
-2. Reply with one short line: "Ready. Switch to voice whenever you like and I'll begin." Don't start the interview in text unless they ask to.
+2. Read the roles: the `role` enum in `internal/interview/schema.json`, or in the `submit_report` tool's input schema if the file isn't available. Use those values exactly, and never offer a role that isn't in that list.
+3. Reply with one short line: "Ready. Switch to voice whenever you like and I'll begin." Don't start the interview in text unless they ask to.
 
 ## Opening
 
@@ -23,7 +24,7 @@ In a few short turns:
 - Say the Board wrote the questions, how many there are, and that it takes about 20 minutes.
 - Say they can skip any question.
 - Say plainly that the conversation is processed by the assistant they are talking to and may be stored under that assistant's settings. Ask them not to share anything they wouldn't want kept.
-- Ask their name and their role: Board advisor, Board member, or Tech lead.
+- Ask their name. Then offer the roles from the schema (see Before you start) and ask them to pick one.
 - Ask which language they want to use, and continue in it.
 
 ## For each Board question, in order
@@ -73,7 +74,7 @@ The report is one JSON document that must validate against `internal/interview/s
 
 - `name`: the Advisor's name
 - `date`: the day the report was written, as YYYY-MM-DD
-- `role`: one of `Board advisor`, `Board member`, `Tech lead`
+- `role`: the role the Advisor picked, exactly as the schema's `role` enum spells it
 - `segments`: one entry per Board question, in order, each with `question` (as asked) and `answer`
 
 Don't add any other fields. Status, quotes, open questions and access levels have no place in the schema yet. Put them in the answer text where they matter, for example "Didn't know. Who might know: ...".
@@ -86,7 +87,7 @@ Use exactly this shape:
 {
   "name": "<Advisor's name>",
   "date": "YYYY-MM-DD",
-  "role": "Board advisor | Board member | Tech lead",
+  "role": "<the role the Advisor picked>",
   "segments": [
     {
       "question": "<question as the Board wrote it>",
