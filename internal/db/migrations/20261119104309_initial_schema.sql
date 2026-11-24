@@ -1,18 +1,9 @@
 -- +goose Up
-CREATE TABLE roles (
-    name text PRIMARY KEY CHECK (name ~ '\S')
-);
-
-INSERT INTO roles (name) VALUES
-    ('Board advisor'),
-    ('Board member'),
-    ('Tech lead');
-
 CREATE TABLE reports (
     id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     name text NOT NULL CHECK (name ~ '\S'),
     date date NOT NULL,
-    role text NOT NULL REFERENCES roles (name),
+    role text NOT NULL CHECK (role ~ '\S'),
     submitted_at timestamptz NOT NULL DEFAULT now()
 );
 
@@ -28,4 +19,3 @@ CREATE TABLE records (
 -- +goose Down
 DROP TABLE records;
 DROP TABLE reports;
-DROP TABLE roles;
