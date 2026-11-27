@@ -17,8 +17,11 @@ func startupFails(t *testing.T, port string) (int, string) {
 	defer cancel()
 	var stderr bytes.Buffer
 	getenv := func(name string) string {
-		if name == "PORT" {
+		switch name {
+		case "PORT":
 			return port
+		case "AUTH_DISABLED":
+			return "true" // these tests are about the port, not sign-in
 		}
 		return ""
 	}
