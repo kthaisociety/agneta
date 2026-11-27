@@ -1,4 +1,4 @@
-# 0002. Sign in through identity-service, with agneta as Claude's authorization server
+# 0003. Sign in through identity-service, with agneta as Claude's authorization server
 
 Status: Proposed
 
@@ -46,13 +46,14 @@ agneta ──(OAuth #2: agneta is an IS client "agneta")─────▶ ident
   - Any other IS failure keeps the grant and answers `temporarily_unavailable`.
 - **`check_access`**, a new MCP tool, returns `{"authorized": true}`. The interview skill calls it first,
   so a broken connection shows up before the first question.
-- **Grants and tokens live in memory** until report storage brings Postgres.
+- **Grants and tokens live in memory** until the app connects to Postgres (ADR 0002 adds the database, but
+  nothing in the app uses it yet).
 - **`AUTH_DISABLED=true`** turns all of this off, for local work only.
 
 ## Consequences
 - A restart or redeploy drops every grant, so every Advisor has to reconnect. That's acceptable for staging
-  tests, and the grants move to Postgres together with the reports (PCR-0002). The IS refresh token must be
-  encrypted once it is stored there.
+  tests, and the grants move to Postgres once the app uses it for reports (ADR 0002, PCR-0002). The IS
+  refresh token must be encrypted once it is stored there.
 - Revoking someone at IS takes effect within an hour, at their next refresh. There is no cache and no
   `/oauth/revoke`.
 - "Logging out" means removing the connector in Claude. An unused grant dies when its IS refresh token
